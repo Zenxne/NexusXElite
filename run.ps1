@@ -8,13 +8,41 @@ function Invoke-NexusXElite {
     try {
         Write-Host "Downloading NexusXElite Bootstrap..." -ForegroundColor Cyan
         
-        # Download Bootstrap.ps1 from GitHub
-        $bootstrapUrl = "https://raw.githubusercontent.com/Zenxne/NexusXElite/main/Core/Bootstrap.ps1"
-        $bootstrapScript = Invoke-WebRequest -Uri $bootstrapUrl -UseBasicParsing
+        # Create temp directory for scripts
+        $tempDir = Join-Path $env:TEMP "NexusXElite"
+        if (!(Test-Path $tempDir)) {
+            New-Item -ItemType Directory -Path $tempDir -Force | Out-Null
+        }
         
-        # Execute the bootstrap script
+        # Download Bootstrap.ps1
+        $bootstrapUrl = "https://raw.githubusercontent.com/Zenxne/NexusXElite/main/Core/Bootstrap.ps1"
+        $bootstrapPath = Join-Path $tempDir "Bootstrap.ps1"
+        Invoke-WebRequest -Uri $bootstrapUrl -OutFile $bootstrapPath -UseBasicParsing
+        
+        # Download all modules
+        $modules = @("HardwareDetection.ps1", "DeepOptimize.ps1", "GamingOptimize.ps1", "NetworkOptimize.ps1")
+        $modulesDir = Join-Path $tempDir "Modules"
+        if (!(Test-Path $modulesDir)) {
+            New-Item -ItemType Directory -Path $modulesDir -Force | Out-Null
+        }
+        foreach ($module in $modules) {
+            $moduleUrl = "https://raw.githubusercontent.com/Zenxne/NexusXElite/main/Modules/$module"
+            $modulePath = Join-Path $modulesDir $module
+            Invoke-WebRequest -Uri $moduleUrl -OutFile $modulePath -UseBasicParsing
+        }
+        
+        # Download UI
+        $uiDir = Join-Path $tempDir "UI"
+        if (!(Test-Path $uiDir)) {
+            New-Item -ItemType Directory -Path $uiDir -Force | Out-Null
+        }
+        $uiUrl = "https://raw.githubusercontent.com/Zenxne/NexusXElite/main/UI/Launcher.ps1"
+        $uiPath = Join-Path $uiDir "Launcher.ps1"
+        Invoke-WebRequest -Uri $uiUrl -OutFile $uiPath -UseBasicParsing
+        
+        # Execute the bootstrap script with temp path
         Write-Host "Executing Bootstrap..." -ForegroundColor Green
-        Invoke-Expression $bootstrapScript.Content
+        & $bootstrapPath -TempPath $tempDir
         
     } catch {
         Write-Host "Error: $($_.Exception.Message)" -ForegroundColor Red

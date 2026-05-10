@@ -1,13 +1,19 @@
 # NexusXElite Bootstrap Script
 # Loads all modules and initializes the application
 
-param()
+param(
+    [string]$TempPath
+)
 
 # Set execution policy for the session
 Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force
 
 # Define paths
-$scriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
+if ($TempPath) {
+    $scriptRoot = $TempPath
+} else {
+    $scriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
+}
 $modulesPath = Join-Path $scriptRoot "Modules"
 $uiPath = Join-Path $scriptRoot "UI"
 $configsPath = Join-Path $scriptRoot "Configs"
