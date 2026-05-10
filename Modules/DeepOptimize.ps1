@@ -53,7 +53,13 @@ function Invoke-DeepOptimization {
         
         # Clear temp files
         Write-Host "Cleaning Temporary Files..." -ForegroundColor Gray
-        Get-ChildItem -Path $env:TEMP -Recurse -Force | Remove-Item -Force -Recurse -ErrorAction SilentlyContinue
+        $tempPath = $env:TEMP
+        if (-not $tempPath) {
+            $tempPath = [System.IO.Path]::GetTempPath()
+        }
+        if ($tempPath) {
+            Get-ChildItem -Path $tempPath -Recurse -Force -ErrorAction SilentlyContinue | Remove-Item -Force -Recurse -ErrorAction SilentlyContinue
+        }
         
         Write-Host "Deep Optimization Complete." -ForegroundColor Green
         
