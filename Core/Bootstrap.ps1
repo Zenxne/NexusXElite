@@ -12,7 +12,12 @@ Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force
 if ($TempPath) {
     $scriptRoot = $TempPath
 } else {
-    $scriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
+    if ($MyInvocation.MyCommand.Path) {
+        $scriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
+    } else {
+        # Fallback for downloaded scripts
+        $scriptRoot = [System.IO.Path]::GetTempPath()
+    }
 }
 $modulesPath = Join-Path $scriptRoot "Modules"
 $uiPath = Join-Path $scriptRoot "UI"

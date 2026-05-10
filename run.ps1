@@ -9,6 +9,9 @@ function Invoke-NexusXElite {
         Write-Host "Downloading NexusXElite Bootstrap..." -ForegroundColor Cyan
         
         # Create temp directory for scripts
+        if (-not $env:TEMP) {
+            $env:TEMP = [System.IO.Path]::GetTempPath()
+        }
         $tempDir = Join-Path $env:TEMP "NexusXElite"
         if (!(Test-Path $tempDir)) {
             New-Item -ItemType Directory -Path $tempDir -Force | Out-Null
